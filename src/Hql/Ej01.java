@@ -154,6 +154,127 @@ public class Ej01 {
 		
 		}
 	}
+	public static void ej14() {
+		Query consulta=sesion.createQuery("SELECT x.nombreEmpleado FROM Empleados x WHERE x.numJefe=7698 AND x.salario>1000");
+		ArrayList<String> lista=(ArrayList<String>) consulta.list();
+		for (String nombre : lista) {
+			System.out.println(nombre);
+		}
+	}
+	
+	//"SELECT x.nombreEmpleado FROM Empleados x WHERE NOT (x.numJefe=7698 AND x.salario>1000)
+	public static void ej15() {
+		Query consulta=sesion.createQuery("SELECT x.nombreEmpleado FROM Empleados x WHERE NOT (x.numJefe=7698 AND x.salario>1000)");
+		ArrayList<String> lista=(ArrayList<String>) consulta.list();
+		for (String nombre : lista) {
+			System.out.println(nombre);
+		}
+	}
+	
+	public static void ej16() {
+		Query consulta=sesion.createQuery("SELECT x.nombreEmpleado,(x.comision/(x.salario+x.comision))*100 FROM Empleados x WHERE x.comision IS NOT NULL "); //DUDAS JOSE
+		ArrayList<Object[]> lista=(ArrayList<Object[]>) consulta.list();
+		for (Object[] objects : lista) {
+			String n=(String) objects[0];
+			BigDecimal r=(BigDecimal) objects[1];
+			System.out.println(n+" - "+r);
+		}
+	}
+	
+	public static void ej17() {
+		Query consulta=sesion.createQuery("SELECT x FROM Empleados x WHERE x.departamentos.numDepartamento=10 AND x.nombreEmpleado LIKE '%LA%'");
+		
+		//(SELECT y.nombre FROM Departamentos y WHERE y.nombre LIKE '%LA%'");
+		ArrayList<Empleados> lista =(ArrayList<Empleados>) consulta.list();
+		for (Empleados empleados : lista) {
+			System.out.println(empleados);
+		}
+	}
+	public static void ej18() {
+		Query consulta=sesion.createQuery("SELECT x FROM Empleados x WHERE x.numJefe IS NULL");
+		ArrayList<Empleados> lista=(ArrayList<Empleados>) consulta.list();
+		for (Empleados empleados : lista) {
+			System.out.println(empleados);
+		}
+	}
+	
+	//Deseamos conocer el nombre de empleado y número de departamento de los administrativos que no trabajan en el departamento 10 y cuyo salario es superior a 800, ordenados por la fecha de alta.
+	public static void ej19() {
+		Query consulta=sesion.createQuery("SELECT x.nombreEmpleado,x.departamentos.numDepartamento FROM Empleados x WHERE x.puesto LIKE 'ADMINISTRATIVO' AND x.departamentos.numDepartamento<>10 AND x.salario>800 ORDER BY x.fechaAlta");
+		ArrayList<Object[]> lista=(ArrayList<Object[]>) consulta.list();
+		for (Object[] objects : lista) {
+			String n=(String) objects[0];
+			int d=(Integer) objects[1];
+			
+			System.out.println("Nombre: "+n+ " Numero departamento "+d);
+		}
+		
+	}
+	
+	public static void ej20() {
+		Query consulta=sesion.createQuery("SELECT x FROM Empleados x WHERE x.nombreEmpleado LIKE 'A%' AND (x.salario>1000 OR COMISION IS NOT NULL) AND x.departamentos=30");
+		ArrayList<Empleados> lista=(ArrayList<Empleados>) consulta.list();
+		for (Empleados empleados : lista) {
+			System.out.println(empleados);
+		}
+	}
+	
+	//Halla el nombre y salario total de todos los empleados ordenado por este último valor, de los empleados con comisión.
+	public static void ej21() {
+		Query consulta=sesion.createQuery("SELECT x.nombreEmpleado,x.salario+x.comision FROM Empleados x WHERE x.comision IS NOT NULL");
+		ArrayList<Object[]> lista=(ArrayList<Object[]>) consulta.list();
+		for (Object[] objects : lista) {
+			String n=(String) objects[0];
+			BigDecimal st=(BigDecimal) objects[1];
+			System.out.println(n+" : "+st);
+		}
+	}
+	//Suponiendo que el año próximo la subida del salario percibido por empleado es del 6%, hallar los nombres y salarios actuales y futuros de todos los empleados, indicando para cada uno si tienen o no comisión.
+	public static void ej22() {
+		Query consulta=sesion.createQuery("SELECT x.salario,x.salario+(x.salario*0.06),x.comision FROM Empleados x");
+		ArrayList<Object[]> lista=(ArrayList<Object[]>) consulta.list();
+		for (Object[] objects : lista) {
+			BigDecimal s=(BigDecimal) objects[0];
+			Double st=(Double) objects[1];
+			BigDecimal c=(BigDecimal) objects[2];
+			System.out.println("Salario actual = "+s+ " Salario futuro = "+st+ " Comision= "+c);
+		}
+		
+	}
+	//Para los empleados que tienen como director a algún otro con número mayor que el suyo, obtener los que reciben de salario más de 1000 y menos de 2000, o están en el departamento 30.
+	public static void ej23() {
+		Query consulta=sesion.createQuery("SELECT x FROM Empleados x WHERE x.numJefe>x.numEmpleado AND (x.salario>1000 AND x.salario<2000) OR x.departamentos=30");
+		ArrayList<Empleados> lista=(ArrayList<Empleados>) consulta.list();
+		for (Empleados empleados : lista) {
+			System.out.println(empleados);
+		}
+	}
+	//. Obtén el salario más alto de la empresa, el total destinado a comisiones y el número de empleados.
+	public static void ej24() {
+		Query consulta=sesion.createQuery("SELECT MAX(x.salario),SUM(x.comision),COUNT(x.numEmpleado) FROM Empleados x");
+		ArrayList<Object[]> lista=(ArrayList<Object[]>) consulta.list();
+		for (Object[] objects : lista) {
+			BigDecimal max=(BigDecimal) objects[0];
+			BigDecimal min=(BigDecimal) objects[1];
+			Long count=(Long) objects[2];
+			
+			System.out.println("Salario MAX: "+max+ "\n"+ "Salario MIN: "+min+"\n"+"Número empleados: "+count);
+		}
+	}
+	//. Obtén información en la que se reflejen los nombres, puestos y salarios de los que superan o igualan el salario de Allen.
+	public static void ej25() {
+		Query consulta=sesion.createQuery("SELECT x.nombreEmpleado,x.puesto,x.comision,x.salario FROM Empleados x WHERE x.salario>=(SELECT y.salario FROM Empleados y WHERE y.nombreEmpleado = 'ALLEN')");
+		ArrayList<Object[]> lista=(ArrayList<Object[]>) consulta.list();
+		for (Object[] objects : lista) {
+			String n=(String) objects[0];
+			String p=(String) objects[1];
+			BigDecimal c=(BigDecimal) objects[2];
+			BigDecimal s=(BigDecimal) objects[3];
+			
+			System.out.println(n+" "+p+" "+c+" "+s);
+		}
+	}
+	
 	
 
 	public static void main(String[] args) {
@@ -205,7 +326,47 @@ public class Ej01 {
 		System.out.println("\n");
 		System.out.println("---------------EJ13-----------------");
 		ej13();//ídem. pero para los que no tienen comisión
-
+		System.out.println("\n");
+		System.out.println("---------------EJ14-----------------");
+		ej14();//Hallar el nombre de los empleados que, teniendo un salario superior a 1000, tienen como jefe al empleado de código 7698
+		System.out.println("\n");
+		System.out.println("---------------EJ15-----------------");
+		ej15();//Halla el conjunto complementario (contrario) del resultado del ejercicio anterior.
+		System.out.println("\n");
+		System.out.println("---------------EJ16-----------------");
+		ej16();//Hallar el porcentaje que supone la comisión sobre el salario total ( (comisión/salario_total)*100), ordenando por nombre (ojo con los valores nulos).
+		System.out.println("\n");
+		System.out.println("---------------EJ17-----------------");
+		ej17();//Hallar los empleados del departamento 10 cuyo nombre no contiene la cadena LA.
+		System.out.println("\n");
+		System.out.println("---------------EJ18-----------------");
+		ej18();//Obtén los empleados que no son supervisados por ningún otro.
+		System.out.println("\n");
+		System.out.println("---------------EJ19-----------------");
+		ej19();//Deseamos conocer el nombre de empleado y número de departamento de los administrativos que no trabajan en el departamento 10 y cuyo salario es superior a 800, ordenados por la fecha de alta.
+		System.out.println("\n");
+		System.out.println("---------------EJ20-----------------");
+		ej20();//Halla los datos de los empleados para los que, su nombre comienza por A y su salario es mayor que 1000, o, reciben comisión y trabajan en el departamento 30.
+		System.out.println("\n");
+		System.out.println("---------------EJ21-----------------");
+		ej21();//Halla el nombre y salario total de todos los empleados ordenado por este último valor, de los empleados con comisión.
+		System.out.println("\n");
+		System.out.println("---------------EJ22-----------------");
+		ej22();//Suponiendo que el año próximo la subida del salario percibido por empleado es del 6%, hallar los nombres y salarios actuales y futuros de todos los empleados, indicando para cada uno si tienen o no comisión.
+		System.out.println("\n");
+		System.out.println("---------------EJ23-----------------");
+		ej23();//Para los empleados que tienen como director a algún otro con número mayor que el suyo, obtener los que reciben de salario más de 1000 y menos de 2000, o están en el departamento 30.
+		System.out.println("\n");
+		System.out.println("---------------EJ24-----------------");
+		ej24();//. Obtén el salario más alto de la empresa, el total destinado a comisiones y el número de empleados.
+		System.out.println("\n");
+		System.out.println("---------------EJ25-----------------");
+		System.out.println("\n");
+		ej25();//. Obtén información en la que se reflejen los nombres, puestos y salarios de los que superan o igualan el salario de Allen.
+		
+		
+		
+		
 		
 		
 		
